@@ -91,7 +91,7 @@ mkdir keys
 cd keys
 echo Writing new keys to %appdata%\yuzu\keys
 powershell.exe (new-object System.Net.WebClient).DownloadFile('https://s.hipeopeodev.us/prod.keys', 'prod.keys')
-powershell.exe (new-object System.Net.WebClient).DownloadFile('https://raw.githubusercontent.com/riggzh/ns/master/NUTDB.txt', 'title.keys')
+powershell.exe (new-object System.Net.WebClient).DownloadFile('https://raw.githubusercontent.com/hipeopeo/s/master/title.keys', 'title.keys')
 if %errorlevel% == 0 (
 	echo Successfully downloaded title.keys, prod.keys
 ) else (
