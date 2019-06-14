@@ -69,7 +69,7 @@ if %errorlevel% == 0 (
 	echo Cleaning up...
 )
 del yuzu_install.exe
-del yuzu_install.log
+del yuzu_installer.log
 echo Done.
 pause
 
