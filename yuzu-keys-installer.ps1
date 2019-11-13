@@ -1,7 +1,14 @@
+param
+(
+	[Switch]$wizard,
+	[Switch]$update,
+	
+	[Switch]$install_yuzu,
+	[Switch]$install_keys,
+	[Switch]$install_sa
+)
+
 "Yuzu Keys Installer"
-$update_script = $false
-$install_yuzu = $false
-$install_keys = $true
 
 $location = Get-Location
 
@@ -13,27 +20,80 @@ function cancel()
 	"This program made by /u/Hipeopeo."
 	"Thanks to the yuzu devs for making Yuzu!"
 	Set-Location $location
-	pause
+	if($wizard -eq $true){pause}
 	exit
 }
 
-while($true)
+if($wizard -eq $true)
 {
-	$menu = (Read-Host -Prompt 'Do you want to update script? (Y/N)').ToLower()
-	if ($menu -eq "y") 
+	$install_keys = $true
+	$install_sa = $true
+	while($true)
 	{
-		$update_script = $true
-		break
-		#goto UY
+		$menu = (Read-Host -Prompt 'Do you want to update script? (Y/N)').ToLower()
+		if ($menu -eq "y") 
+		{
+			$update = $true
+			break
+			#goto UY
+		}
+		if ($menu -eq "n") {break} #goto A
+		else 
+		{
+			"Invalid input. Please try again."
+		}
 	}
-	if ($menu -eq "n") {break} #goto A
-	else 
+
+	while($true) #:A 
 	{
-		"Invalid input. Please try again."
+		$menu = (Read-Host -Prompt 'Do you want to install Yuzu? (Y/N/Cancel)').ToLower()
+		if ($menu -eq 'y') 
+		{
+			$install_yuzu = $true
+			break
+		}
+		if ($menu -eq 'n') {break } #goto No
+		if ($menu -eq 'c') {cancel} #goto c
+		if ($menu -eq 'system archives') 
+		{
+			$install_keys = $false
+			break #goto SA
+		}
+		if ($menu -eq 'sa') 
+		{
+			$install_keys = $false
+			break #goto SA
+		}
+		else
+		{ 
+			"Invalid input. Please try again..."
+			Continue
+		}
+		break
+	}
+
+	while($true) #:A 
+	{
+		$menu = (Read-Host -Prompt 'Do you want to install System Archives? (Y/N)').ToLower()
+		if ($menu -eq 'y') 
+		{
+			break
+		}
+		if ($menu -eq 'n') 
+		{
+			$install_sa = $false
+			break
+		}
+		else
+		{ 
+			"Invalid input. Please try again..."
+			Continue
+		}
+		break
 	}
 }
 
-if($update_script) #:UY 
+if($update) #:UY 
 {
 	"Updating"
 	"`n"
@@ -41,44 +101,19 @@ if($update_script) #:UY
 	try
 	{
 		Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/yuzu-keys-installer.ps1' -OutFile 'yuzu-keys-installer.ps1'
-		"Starting updated script"
-		powershell -file "yuzu-keys-installer.ps1"
+		if($wizard -eq $true)
+		{
+			"Starting updated script"
+			powershell -file "yuzu-keys-installer.ps1" -wizard
+		}
 	}
 	catch
 	{
 		"Exiting due to error in :UY"
 		exit
 	}
-
 }
 
-while($true) #:A 
-{
-	$menu = (Read-Host -Prompt 'Do you want to install Yuzu? (Y/N/System Archives/Cancel)').ToLower()
-	if ($menu -eq 'y') 
-	{
-		$install_yuzu = $true
-		break
-	}
-	if ($menu -eq 'n') {break } #goto No
-	if ($menu -eq 'c') {cancel} #goto c
-	if ($menu -eq 'system archives') 
-	{
-		$install_keys = $false
-		break #goto SA
-	}
-	if ($menu -eq 'sa') 
-	{
-		$install_keys = $false
-		break #goto SA
-	}
-	else
-	{ 
-		"Invalid input. Please try again..."
-		Continue
-	}
-	break
-}
 
 if($install_yuzu) #:Yes 
 {
@@ -142,7 +177,7 @@ if($install_keys) #:No
 	"Successfully downloaded title.keys, prod.keys"
 }
 
-if($true) #:SA 
+if($install_sa) #:SA 
 {
 	"`n"
 	"We will now download the System Archives. This may take a while..."
