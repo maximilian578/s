@@ -1,14 +1,18 @@
 "Yuzu Keys Installer"
 $update_script = $false
 $install_yuzu = $false
-
 $install_keys = $true
+
+$location = Get-Location
+
+$ProgressPreference = 'silentlyContinue'
 
 function cancel()
 {
 	"Thanks to /u/yuzu_pirate, /u/Azurime, and /u/bbb651 for their contributions to /r/YuzuP I R A C Y."
 	"This program made by /u/Hipeopeo."
 	"Thanks to the yuzu devs for making Yuzu!"
+	Set-Location $location
 	pause
 	exit
 }
@@ -93,7 +97,7 @@ if($install_yuzu) #:Yes
 		if($reply.StatusDescription -eq "OK")
 		{
 			$url = (ConvertFrom-Json $reply).assets.browser_download_url
-			Invoke-WebRequest -Uri $url -OutFile 'yuzu_install.exe'
+			Invoke-WebRequest -ContentType "application/octet-stream" -Uri $url -OutFile 'yuzu_install.exe'
 			"We will now install yuzu, then delete the installer."
 			Start-Process "yuzu_install.exe" -Wait
 		}
@@ -128,8 +132,8 @@ if($install_keys) #:No
 	"Writing new keys to $env:appdata\yuzu\keys"
 	try
 	{
-		Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/prod.keys' -OutFile 'prod.keys'
-		Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/title.keys' -OutFile 'title.keys'
+		Invoke-WebRequest -ContentType "application/octet-stream" -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/prod.keys' -OutFile 'prod.keys'
+		Invoke-WebRequest -ContentType "application/octet-stream" -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/title.keys' -OutFile 'title.keys'
 	}
 	catch
 	{
@@ -145,11 +149,11 @@ if($true) #:SA
 	Set-Location "$env:appdata\yuzu\nand\system"
 	try
 	{
-		Invoke-WebRequest -Uri 'https://www.dropbox.com/s/0gwmpgus9t4q1dm/System_Archives.zip?dl=1' -OutFile 'System_Archives.zip'
+		Invoke-WebRequest -ContentType "application/octet-stream" -Uri 'https://www.dropbox.com/s/0gwmpgus9t4q1dm/System_Archives.zip?dl=1' -OutFile 'System_Archives.zip'
 		"unzipping System Archives."
-		Invoke-WebRequest -Uri 'https://www.dropbox.com/s/wcdhkat6oz0i3tm/unzip.exe?dl=1' -OutFile 'unzip.exe'
+		Invoke-WebRequest -ContentType "application/octet-stream" -Uri 'https://www.dropbox.com/s/wcdhkat6oz0i3tm/unzip.exe?dl=1' -OutFile 'unzip.exe'
 		"Writing System Archives to $env:appdata\yuzu\keys\nand\system"
-		.\unzip.exe "System_Archives.zip"
+		.\unzip.exe -o "System_Archives.zip"
 	}
 	catch
 	{
