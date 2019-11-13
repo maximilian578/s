@@ -92,8 +92,11 @@ if($install_yuzu)
 		if($reply.StatusDescription -eq "OK")
 		{
 			$url = (ConvertFrom-Json $reply).assets.browser_download_url
+			" --Downloading yuzu_install.exe..."
 			Invoke-WebRequest -ContentType "application/octet-stream" -Uri $url -OutFile 'yuzu_install.exe'
+			" --Launching yuzu_install.exe..."
 			Start-Process "yuzu_install.exe" -Wait
+			" --yuzu_install.exe exited"
 		}
 		else
 		{
