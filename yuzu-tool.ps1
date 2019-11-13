@@ -5,7 +5,9 @@
     Options:
     -help Display this message and exit.
 
-    -update Update script file and exit.
+	-update Update script file and exit.
+	
+	-default_install Install Yuzu, keys and system archives.
 
     -install_yuzu Download and launch latest yuzu installer.
         

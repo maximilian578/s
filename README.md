@@ -3,12 +3,20 @@ This script was written by me, Hipeopeo, creator, and Moderator, of /r/YuzuPirac
 
 Thanks for the help you guys!
 
-# powershell Usage
- - pass `-wizard` for easy usage
- - pass `-update` to update script
- - pass `-install_yuzu` to istall yuzu
- - pass `-install_keys` to intall keys
- - pass `-install_sa` to install System Archives
+# powershell options
+- `-help` Display help and exit.
+
+- `-update` Update script file and exit.
+	
+- `-default_install` Install Yuzu, keys and system archives.
+
+- `-install_yuzu` Download and launch latest yuzu installer.
+        
+- `-install_keys` Istall switch products key files.
+
+- `-install_sa` Istall switch system archives.
+
+- `-credits` Display credits when done.
 
 # How Can I Help With The Script?
 Create a Pull Request.
