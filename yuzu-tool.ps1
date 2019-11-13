@@ -17,9 +17,9 @@
 
     -credits Display credits when done.
 .EXAMPLE
-   ./yuzu-keys-installer.ps1 -install_yuzu -install_keys -install_sa
+   ./yuzu-tool.ps1 -install_yuzu -install_keys -install_sa
 .EXAMPLE
-   ./yuzu-keys-installer.ps1 -update
+   ./yuzu-tool.ps1 -update
 #>
 
 param
@@ -27,6 +27,7 @@ param
 	[Switch]$help,
 	[Switch]$update,
 	
+	[Switch]$default_install,
 	[Switch]$install_yuzu,
 	[Switch]$install_keys,
 	[Switch]$install_sa,
@@ -64,18 +65,24 @@ if($update)
 	}
 	catch
 	{
-		"Exiting due to error in :UY"
+		"! Exiting due to error in :UY"
 		exit
 	}
 }
 
+if($default_install)
+{
+	$install_yuzu = $true
+	$install_keys = $true
+	$install_sa = $true
+}
 
 if($install_yuzu) 
 {
-
+	"Installing yuzu"
 	if(Test-Path "yuzu_install.exe")
 	{
-		"Removing old version..."
+		" --Removing old version"
 		Remove-Item "yuzu_install.exe"
 	}
 	try
@@ -95,8 +102,8 @@ if($install_yuzu)
 	}
 	catch
 	{
-		"Error encountered in :Yes"
-		"Cleaning up..."
+		"! Error encountered in :Yes"
+		" --Cleaning up"
 	}
 	Remove-Item "yuzu_install.exe" | out-null
 	Remove-Item "yuzu_installer.log" | out-null
@@ -104,15 +111,16 @@ if($install_yuzu)
 
 if($install_keys)
 {
+	"Installing keys"
 	Set-Location "$env:appdata\yuzu"
 	if((Test-Path "keys\prod.keys") -or (Test-Path "keys\title.keys"))
 	{
-		"Deleting old keys..."
+		" --Deleting old keys"
 		Remove-Item "keys" -Recurse -Force
 	}
 	(New-Item -Name "keys" -ItemType directory) | out-null
 	Set-Location "keys"
-	"Writing new keys to $env:appdata\yuzu\keys"
+	" --Writing new keys to $env:appdata\yuzu\keys"
 	try
 	{
 		Invoke-WebRequest -ContentType "application/octet-stream" -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/prod.keys' -OutFile 'prod.keys'
@@ -120,27 +128,28 @@ if($install_keys)
 	}
 	catch
 	{
-		"Error in :No"
+		"! Error in :No"
 	}
-	"Successfully downloaded title.keys, prod.keys"
 }
 
 if($install_sa)
 {
+	"Installing system Archives"
 	Set-Location "$env:appdata\yuzu\nand\system"
 	try
 	{
+		" --Downloading System Archives..."
 		Invoke-WebRequest -ContentType "application/octet-stream" -Uri 'https://www.dropbox.com/s/0gwmpgus9t4q1dm/System_Archives.zip?dl=1' -OutFile 'System_Archives.zip'
-		"unzipping System Archives."
+		" --Downloading unzip.exe..."
 		Invoke-WebRequest -ContentType "application/octet-stream" -Uri 'https://www.dropbox.com/s/wcdhkat6oz0i3tm/unzip.exe?dl=1' -OutFile 'unzip.exe'
-		"Writing System Archives to $env:appdata\yuzu\keys\nand\system"
-		.\unzip.exe -o "System_Archives.zip"
+		" --Unzipping System Archives to $env:appdata\yuzu\keys\nand\system"
+		.\unzip.exe -oq "System_Archives.zip"
 	}
 	catch
 	{
-		"Fatal error in :SA, cleaning up and exiting"
+		"! Fatal error in :SA, cleaning up and exiting"
 	}
-	"Cleaning up..."
+	" --Cleaning up..."
 	Remove-Item "System_Archives.zip" | out-null
 	Remove-Item "unzip.exe" | out-null
 }
