@@ -36,7 +36,7 @@ if($update_script) #:UY
 	"Downloading new version..."
 	try
 	{
-		Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/hipeopeo/s/master/yuzu-keys-installer.ps1' -OutFile 'yuzu-keys-installer.ps1'
+		Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/yuzu-keys-installer.ps1' -OutFile 'yuzu-keys-installer.ps1'
 		"Starting updated script"
 		powershell -file "yuzu-keys-installer.ps1"
 	}
@@ -128,8 +128,8 @@ if($install_keys) #:No
 	"Writing new keys to $env:appdata\yuzu\keys"
 	try
 	{
-		Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/hipeopeo/s/master/prod.keys' -OutFile 'prod.keys'
-		Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/hipeopeo/s/master/title.keys' -OutFile 'title.keys'
+		Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/prod.keys' -OutFile 'prod.keys'
+		Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/title.keys' -OutFile 'title.keys'
 	}
 	catch
 	{
