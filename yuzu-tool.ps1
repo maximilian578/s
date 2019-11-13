@@ -1,14 +1,36 @@
+<#
+.Synopsis
+   A tool for installing yuzu, product keys and system archives.
+.DESCRIPTION
+    Options:
+    -help Display this message and exit.
+
+    -update Update script file and exit.
+
+    -install_yuzu Download and launch latest yuzu installer.
+        
+	-install_keys Istall switch products key files.
+
+    -install_sa Istall switch system archives.
+
+    -credits Display credits when done.
+.EXAMPLE
+   ./yuzu-keys-installer.ps1 -install_yuzu -install_keys -install_sa
+.EXAMPLE
+   ./yuzu-keys-installer.ps1 -update
+#>
+
 param
 (
-	[Switch]$wizard,
+	[Switch]$help,
 	[Switch]$update,
 	
 	[Switch]$install_yuzu,
 	[Switch]$install_keys,
-	[Switch]$install_sa
-)
+	[Switch]$install_sa,
 
-"Yuzu Keys Installer"
+	[Switch]$credits
+)
 
 $location = Get-Location
 
@@ -16,96 +38,27 @@ $ProgressPreference = 'silentlyContinue'
 
 function cancel()
 {
-	"Thanks to /u/yuzu_pirate, /u/Azurime, and /u/bbb651 for their contributions to /r/YuzuP I R A C Y."
-	"This program made by /u/Hipeopeo."
-	"Thanks to the yuzu devs for making Yuzu!"
+	if($credits)
+	{
+		"Thanks to /u/yuzu_pirate, /u/Azurime, and /u/bbb651 for their contributions to /r/YuzuP I R A C Y."
+		"This program made by /u/Hipeopeo."
+		"Thanks to the yuzu devs for making Yuzu!"
+	}
 	Set-Location $location
-	if($wizard -eq $true){pause}
 	exit
 }
 
-if($wizard -eq $true)
+if($help)
 {
-	$install_keys = $true
-	$install_sa = $true
-	while($true)
-	{
-		$menu = (Read-Host -Prompt 'Do you want to update script? (Y/N)').ToLower()
-		if ($menu -eq "y") 
-		{
-			$update = $true
-			break
-			#goto UY
-		}
-		if ($menu -eq "n") {break} #goto A
-		else 
-		{
-			"Invalid input. Please try again."
-		}
-	}
-
-	while($true) #:A 
-	{
-		$menu = (Read-Host -Prompt 'Do you want to install Yuzu? (Y/N/Cancel)').ToLower()
-		if ($menu -eq 'y') 
-		{
-			$install_yuzu = $true
-			break
-		}
-		if ($menu -eq 'n') {break } #goto No
-		if ($menu -eq 'c') {cancel} #goto c
-		if ($menu -eq 'system archives') 
-		{
-			$install_keys = $false
-			break #goto SA
-		}
-		if ($menu -eq 'sa') 
-		{
-			$install_keys = $false
-			break #goto SA
-		}
-		else
-		{ 
-			"Invalid input. Please try again..."
-			Continue
-		}
-		break
-	}
-
-	while($true) #:A 
-	{
-		$menu = (Read-Host -Prompt 'Do you want to install System Archives? (Y/N)').ToLower()
-		if ($menu -eq 'y') 
-		{
-			break
-		}
-		if ($menu -eq 'n') 
-		{
-			$install_sa = $false
-			break
-		}
-		else
-		{ 
-			"Invalid input. Please try again..."
-			Continue
-		}
-		break
-	}
+	Get-Help "$PSScriptRoot/$($MyInvocation.MyCommand.Name)"
+	exit
 }
 
-if($update) #:UY 
+if($update)
 {
-	"Updating"
-	"`n"
-	"Downloading new version..."
 	try
 	{
-		Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/yuzu-keys-installer.ps1' -OutFile 'yuzu-keys-installer.ps1'
-		if($wizard -eq $true)
-		{
-			"Starting updated script"
-			powershell -file "yuzu-keys-installer.ps1" -wizard
-		}
+		Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/yuzu-tool.ps1' -OutFile 'yuzu-tool.ps1'
 	}
 	catch
 	{
@@ -115,11 +68,9 @@ if($update) #:UY
 }
 
 
-if($install_yuzu) #:Yes 
+if($install_yuzu) 
 {
-	"`n"
-	"This will download the Yuzu installer, and run it. Allow it to install."
-	"`n"
+
 	if(Test-Path "yuzu_install.exe")
 	{
 		"Removing old version..."
@@ -133,7 +84,6 @@ if($install_yuzu) #:Yes
 		{
 			$url = (ConvertFrom-Json $reply).assets.browser_download_url
 			Invoke-WebRequest -ContentType "application/octet-stream" -Uri $url -OutFile 'yuzu_install.exe'
-			"We will now install yuzu, then delete the installer."
 			Start-Process "yuzu_install.exe" -Wait
 		}
 		else
@@ -148,14 +98,10 @@ if($install_yuzu) #:Yes
 	}
 	Remove-Item "yuzu_install.exe" | out-null
 	Remove-Item "yuzu_installer.log" | out-null
-	"Done."
 }
 
-if($install_keys) #:No 
+if($install_keys)
 {
-	"Okay, that means it's time to download the keys."
-	"`n"
-	"We will now download the keys."
 	Set-Location "$env:appdata\yuzu"
 	if((Test-Path "keys\prod.keys") -or (Test-Path "keys\title.keys"))
 	{
@@ -177,10 +123,8 @@ if($install_keys) #:No
 	"Successfully downloaded title.keys, prod.keys"
 }
 
-if($install_sa) #:SA 
+if($install_sa)
 {
-	"`n"
-	"We will now download the System Archives. This may take a while..."
 	Set-Location "$env:appdata\yuzu\nand\system"
 	try
 	{
@@ -199,4 +143,4 @@ if($install_sa) #:SA
 	Remove-Item "unzip.exe" | out-null
 }
 
-cancel #:c 
+cancel
