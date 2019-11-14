@@ -36,6 +36,7 @@ param
 )
 
 $location = Get-Location
+$update_needed = $false
 
 $ProgressPreference = 'silentlyContinue'
 
@@ -51,6 +52,34 @@ function cancel()
 	exit
 }
 
+try
+{
+	$reply = Invoke-WebRequest "https://raw.githubusercontent.com/zeewanderer/s/master/version"
+	if($reply.StatusDescription -eq "OK")
+	{
+		$upstream_version = $reply.Content
+		$current_version = Get-Content -Path "$PSScriptRoot/version"
+		if($upstream_version -ne $current_version)
+		{
+			$update_needed = $true
+			if(!$update)
+			{
+				Write-Host "!W New tools version available" -ForegroundColor Yellow
+			}
+		}
+		
+	}
+	else
+	{
+		throw $reply
+	}
+}
+catch
+{
+	Write-Host "!E Error checking new version" -ForegroundColor Red
+}
+
+
 if($help)
 {
 	Get-Help "$PSScriptRoot/$($MyInvocation.MyCommand.Name)"
@@ -61,11 +90,18 @@ if($update)
 {
 	try
 	{
-		Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/yuzu-tool.ps1' -OutFile 'yuzu-tool.ps1'
+		if ($update_needed)
+		{
+			Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/yuzu-tool.ps1' -OutFile 'yuzu-tool.ps1'
+		}
+		else
+		{
+			Write-Host "!W Update requested but new version not available" -ForegroundColor Yellow
+		}
 	}
 	catch
 	{
-		"! Exiting due to error in :UY"
+		Write-Host "!F Error while updating" -ForegroundColor Magenta
 		exit
 	}
 }
@@ -105,7 +141,7 @@ if($install_yuzu)
 	}
 	catch
 	{
-		"! Error encountered in :Yes"
+		Write-Host "!E Error encountered while installing yuzu" -ForegroundColor Red
 		" --Cleaning up"
 	}
 	Remove-Item "yuzu_install.exe" | out-null
@@ -116,28 +152,29 @@ if($install_keys)
 {
 	"Installing keys"
 	Set-Location "$env:appdata\yuzu"
-	if((Test-Path "keys\prod.keys") -or (Test-Path "keys\title.keys"))
-	{
-		" --Deleting old keys"
-		Remove-Item "keys" -Recurse -Force
-	}
-	(New-Item -Name "keys" -ItemType directory) | out-null
-	Set-Location "keys"
-	" --Writing new keys to $env:appdata\yuzu\keys"
 	try
 	{
+		if((Test-Path "keys\prod.keys") -or (Test-Path "keys\title.keys"))
+		{
+			" --Deleting old keys"
+			Remove-Item "keys" -Recurse -Force
+		}
+		(New-Item -Name "keys" -ItemType directory) | out-null
+		Set-Location "keys"
+		" --Writing new keys to $env:appdata\yuzu\keys"
+	
 		Invoke-WebRequest -ContentType "application/octet-stream" -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/prod.keys' -OutFile 'prod.keys'
 		Invoke-WebRequest -ContentType "application/octet-stream" -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/title.keys' -OutFile 'title.keys'
 	}
 	catch
 	{
-		"! Error in :No"
+		Write-Host "!E Error while installing keys" -ForegroundColor Red
 	}
 }
 
 if($install_sa)
 {
-	"Installing system Archives"
+	"Installing System Archives"
 	Set-Location "$env:appdata\yuzu\nand\system"
 	try
 	{
@@ -150,7 +187,7 @@ if($install_sa)
 	}
 	catch
 	{
-		"! Fatal error in :SA, cleaning up and exiting"
+		Write-Host "!E Error while installing System Archives" -ForegroundColor Red
 	}
 	" --Cleaning up..."
 	Remove-Item "System_Archives.zip" | out-null
