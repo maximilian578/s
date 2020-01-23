@@ -35,7 +35,6 @@ param
 	[Switch]$credits
 )
 
-$location = Get-Location
 $update_needed = $false
 
 $ProgressPreference = 'silentlyContinue'
@@ -48,7 +47,6 @@ function cancel()
 		"This program made by /u/Hipeopeo."
 		"Thanks to the yuzu devs for making Yuzu!"
 	}
-	Set-Location $location
 	exit
 }
 
@@ -82,7 +80,7 @@ catch
 
 if($help)
 {
-	Get-Help "$PSScriptRoot/$($MyInvocation.MyCommand.Name)"
+	Get-Help "$PSScriptRoot\$($MyInvocation.MyCommand.Name)"
 	exit
 }
 
@@ -92,7 +90,8 @@ if($update)
 	{
 		if ($update_needed)
 		{
-			Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/yuzu-tool.ps1' -OutFile 'yuzu-tool.ps1'
+			Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/yuzu-tool.ps1' -OutFile "$PSScriptRoot\yuzu-tool.ps1"
+			Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/version' -OutFile "$PSScriptRoot\version"
 		}
 		else
 		{
@@ -123,6 +122,7 @@ if($install_yuzu)
 	}
 	try
 	{
+		" --Looking for latest version..."
 		$reply = Invoke-WebRequest "https://api.github.com/repos/yuzu-emu/liftinstall/releases/latest"
 
 		if($reply.StatusDescription -eq "OK")
@@ -151,20 +151,19 @@ if($install_yuzu)
 if($install_keys)
 {
 	"Installing keys"
-	Set-Location "$env:appdata\yuzu"
+	$location = "$env:appdata\yuzu\keys"
 	try
 	{
-		if((Test-Path "keys\prod.keys") -or (Test-Path "keys\title.keys"))
+		if(Test-Path "$location")
 		{
 			" --Deleting old keys"
-			Remove-Item "keys" -Recurse -Force
+			Remove-Item "$location" -Recurse -Force
 		}
-		(New-Item -Name "keys" -ItemType directory) | out-null
-		Set-Location "keys"
-		" --Writing new keys to $env:appdata\yuzu\keys"
+		(New-Item -Path "$location" -ItemType directory) | out-null
+		" --Writing new keys to $location"
 	
-		Invoke-WebRequest -ContentType "application/octet-stream" -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/prod.keys' -OutFile 'prod.keys'
-		Invoke-WebRequest -ContentType "application/octet-stream" -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/title.keys' -OutFile 'title.keys'
+		Invoke-WebRequest -ContentType "application/octet-stream" -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/prod.keys' -OutFile "$location\prod.keys"
+		Invoke-WebRequest -ContentType "application/octet-stream" -Uri 'https://raw.githubusercontent.com/zeewanderer/s/master/title.keys' -OutFile "$location\title.keys"
 	}
 	catch
 	{
@@ -175,23 +174,23 @@ if($install_keys)
 if($install_sa)
 {
 	"Installing System Archives"
-	Set-Location "$env:appdata\yuzu\nand\system"
+	$location = "$env:appdata\yuzu\nand\system"
 	try
 	{
 		" --Downloading System Archives..."
-		Invoke-WebRequest -ContentType "application/octet-stream" -Uri 'https://www.dropbox.com/s/0gwmpgus9t4q1dm/System_Archives.zip?dl=1' -OutFile 'System_Archives.zip'
+		Invoke-WebRequest -ContentType "application/octet-stream" -Uri 'https://www.dropbox.com/s/0gwmpgus9t4q1dm/System_Archives.zip?dl=1' -OutFile "$location\System_Archives.zip"
 		" --Downloading unzip.exe..."
-		Invoke-WebRequest -ContentType "application/octet-stream" -Uri 'https://www.dropbox.com/s/wcdhkat6oz0i3tm/unzip.exe?dl=1' -OutFile 'unzip.exe'
-		" --Unzipping System Archives to $env:appdata\yuzu\keys\nand\system"
-		.\unzip.exe -oq "System_Archives.zip"
+		Invoke-WebRequest -ContentType "application/octet-stream" -Uri 'https://www.dropbox.com/s/wcdhkat6oz0i3tm/unzip.exe?dl=1' -OutFile "$location\unzip.exe"
+		" --Unzipping System Archives to $location"
+		& "$location\unzip.exe" -oq "$location\System_Archives.zip" -d "$location"
 	}
 	catch
 	{
 		Write-Host "!E Error while installing System Archives" -ForegroundColor Red
 	}
 	" --Cleaning up..."
-	Remove-Item "System_Archives.zip" | out-null
-	Remove-Item "unzip.exe" | out-null
+	Remove-Item "$location\System_Archives.zip" | out-null
+	Remove-Item "$location\unzip.exe" | out-null
 }
 
 cancel
