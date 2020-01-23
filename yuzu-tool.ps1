@@ -76,7 +76,7 @@ try
 }
 catch
 {
-	Write-Host "!E Error checking new version" -ForegroundColor Red
+	Write-Host "!E Error checking for new version" -ForegroundColor Red
 }
 
 
