@@ -7,7 +7,7 @@
 
 	-update Update script file and exit.
 	
-	-default_install Install Yuzu, keys and system archives.
+	-default_install Install Yuzu and keys.
 
     -install_yuzu Download and launch latest yuzu installer.
         
@@ -109,7 +109,6 @@ if($default_install)
 {
 	$install_yuzu = $true
 	$install_keys = $true
-	$install_sa = $true
 }
 
 if($install_yuzu) 
