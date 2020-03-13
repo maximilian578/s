@@ -103,6 +103,7 @@ if($update)
 		Write-Host "!F Error while updating" -ForegroundColor Magenta
 		exit
 	}
+	exit
 }
 
 if($default_install)
