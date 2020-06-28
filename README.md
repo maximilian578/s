@@ -8,13 +8,13 @@ Thanks for the help you guys!
 
 - `-update` Update script file and exit.
 	
-- `-default_install` Install Yuzu, keys and system archives.
+- `-default_install` Install Yuzu and keys.
 
 - `-install_yuzu` Download and launch latest yuzu installer.
         
 - `-install_keys` Istall switch products key files.
 
-- `-install_sa` Istall switch system archives.
+- `-install_sa` Istall switch system archives. // Installing system archives is no longer required
 
 - `-credits` Display credits when done.
 
